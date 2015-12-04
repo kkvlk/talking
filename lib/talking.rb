@@ -48,4 +48,31 @@ module Talking
       )
     end
   end
+
+  # Public: A helper mixin that enables talking through other speakers.
+  module TalkThrough
+    def self.included(klass)
+      klass.extend(ClassMethods)
+      klass.extend(SingleForwardable)
+    end
+
+    # Forwardable won't work here, we have to meta-define this stuff.
+    %w(say debug).each do |method|
+      define_method(method.to_sym) do |*args|
+        self.class.speaker.send(method, *args)
+      end
+    end
+
+    module ClassMethods
+      # Public: Defines a speaker to talk through.
+      def talk_through(speaker)
+        @speaker = speaker
+      end
+
+      # Public: Returns defined speaker.
+      def speaker
+        @speaker
+      end
+    end
+  end
 end

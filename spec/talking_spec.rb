@@ -75,4 +75,43 @@ describe Talking do
       dummy.debug(message)
     end
   end
+
+  describe Talking::TalkThrough do
+    let(:dummy_klass) do
+      Class.new do
+        include Talking::Talkative
+      end
+    end
+
+    let(:dummy) do
+      dummy_klass.new
+    end
+
+    let(:another_dummy_klass) do
+      speaker = dummy
+
+      Class.new do
+        include Talking::TalkThrough
+        talk_through speaker
+      end
+    end
+
+    let(:another_dummy) do
+      another_dummy_klass.new
+    end
+
+    let(:message) do
+      "This is Sparta!"
+    end
+
+    it 'delegates #say to speaker' do
+      expect(dummy).to receive(:say).with(message)
+      another_dummy.say(message)
+    end
+
+    it 'delegates #debug to speaker' do
+      expect(dummy).to receive(:debug).with(message)
+      another_dummy.debug(message)
+    end
+  end
 end
